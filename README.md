@@ -1,13 +1,11 @@
 # Build multi-agent workflows with Strands Agents SDK on AWS
 
-Companion code for the AWS re:Invent 2026 workshop OPN307: six Jupyter notebook labs covering five multi-agent
-patterns plus an optional observability lab.
+Companion code for the AWS re:Invent 2026 workshop OPN307: six Jupyter notebook labs covering five Strands
+multi-agent patterns plus an optional AgentCore observability lab. Each takes about 20–25 minutes, and no agent code
+needs editing. Labs 1 and 4 contain an optional observability cell to run before their first Gateway or Memory
+activity when you plan to try Lab 6.
 
 > **Important:** This is sample code for demonstration and educational purposes. It is not intended for production use without additional security testing and review. See [SECURITY.md](SECURITY.md).
-
-Five Strands multi-agent pattern labs plus one optional AgentCore observability lab. Each takes about 20–25 minutes.
-Labs 1 and 4 contain an optional observability cell to run before their first Gateway or Memory activity when
-you plan to complete Lab 6. No agent code needs editing.
 
 | Lab | Folder / notebook | Pattern | External connection |
 | --- | --- | --- | --- |
@@ -16,7 +14,18 @@ you plan to complete Lab 6. No agent code needs editing.
 | 3 | [`03-workflow/workflow.ipynb`](./03-workflow/workflow.ipynb) | Workflow (fixed code orchestration, typed handoffs) | S3 receipt bucket; decision records written back to S3 |
 | 4 | [`04-swarm/swarm.ipynb`](./04-swarm/swarm.ipynb) | Swarm | AgentCore Memory as tools; CloudWatch Logs from a failing Lambda function |
 | 5 | [`05-a2a/a2a.ipynb`](./05-a2a/a2a.ipynb) | A2A | Local `A2AServer` instances in the notebook; `A2AClientToolProvider` on the caller |
-| 6 (optional) | [`06-observability/observability.ipynb`](./06-observability/observability.ipynb) | Operations | AgentCore Observability for the Lab 1 Gateway: application logs, traces, and CloudWatch GenAI Observability |
+| 6 (optional) | [`06-observability/observability.ipynb`](./06-observability/observability.ipynb) | Observability | AgentCore Observability for the Lab 1 Gateway: application logs, traces, and CloudWatch GenAI Observability |
+
+## Prerequisites
+
+- **A US AWS Region.** The labs use `us.amazon.nova-pro-v1:0`, a US cross-Region inference profile, so run the
+  notebooks in a US Region.
+- **Python 3.11 or later.**
+- **Amazon Bedrock model access** for Amazon Nova Pro, Anthropic Claude Sonnet 5, and Anthropic Claude Haiku 4.5.
+- **IAM permissions** to deploy and delete the Labs 1-4 CloudFormation stacks and the resources they create.
+
+> **Cost note (Lab 6):** Lab 6 (and the optional observability cells in Labs 1 and 4) enables CloudWatch
+> Transaction Search with 100% span indexing, which incurs CloudWatch charges. Run the Lab 6 cleanup cell afterwards.
 
 ## Running a lab
 
