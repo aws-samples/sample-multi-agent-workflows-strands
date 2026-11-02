@@ -1,0 +1,166 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Multi-agent workshop Lab 4 (Swarm) backend. An Amazon Bedrock AgentCore Memory with one
+  semantic strategy stores past incidents, and a small AWS Lambda function fails on purpose so
+  the swarm has real CloudWatch Logs to investigate. The same template is deployed by the
+  notebook (ProvisionedBy=notebook) or by Workshop Studio (ProvisionedBy=workshop-studio).
+
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
+
+Parameters:
+  ProvisionedBy:
+    Type: String
+    Default: notebook
+    AllowedValues:
+      - notebook
+      - workshop-studio
+    Description: >-
+      Who deployed this stack. The notebook cleanup cell deletes only stacks provisioned by the
+      notebook, never a Workshop Studio stack.
+
+Resources:
+  # Past incidents. The notebook writes incidents as events (create_event) and the semantic
+  # strategy extracts them into long-term records under /incidents/{actorId}/, which
+  # recall_past_incidents searches with MemoryClient.retrieve_memories (the RetrieveMemoryRecords
+  # API). A built-in strategy uses service-managed models, so no MemoryExecutionRoleArn is needed.
+  IncidentMemory:
+    Type: AWS::BedrockAgentCore::Memory
+    # Workshop data only: delete it with the stack so nothing is left behind.
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      # Name is mandatory: letters, digits, and underscores, starting with a letter, at most
+      # 48 characters, unique in the account and Region. The suffix is the first block of this
+      # stack's UUID, so a re-created stack never collides with a memory that is still deleting.
+      Name: !Join
+        - ''
+        - - multi_agent_workshop_swarm_
+          - !Select [0, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]
+      Description: Past Lambda incidents recalled by the error-analysis swarm
+      # Raw events are only needed long enough for extraction and a workshop session.
+      EventExpiryDuration: 7
+      MemoryStrategies:
+        - SemanticMemoryStrategy:
+            Name: IncidentFacts
+            Description: Durable facts about past incidents (service, symptom, root cause, fix)
+            NamespaceTemplates:
+              - /incidents/{actorId}/
+      Tags:
+        multi-agent-workshop:lab: swarm
+        multi-agent-workshop:provisioned-by: !Ref ProvisionedBy
+
+  # The failing function: a user registration handler that reads a user record with no email
+  # and calls .lower() on None. Every invocation of user u-1002 raises the same AttributeError,
+  # so the log group holds a real traceback for the logs investigator.
+  FailingFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      RetentionInDays: 7
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: swarm
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+
+  FailingFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      # The function only writes its own logs; it calls no other AWS service.
+      Policies:
+        - PolicyName: write-own-logs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${FailingFunctionLogGroup}:log-stream:*'
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: swarm
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+
+  FailingFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Multi-agent workshop user registration handler that fails on purpose
+      Runtime: python3.13
+      Handler: index.lambda_handler
+      Role: !GetAtt FailingFunctionRole.Arn
+      Timeout: 10
+      MemorySize: 128
+      LoggingConfig:
+        LogGroup: !Ref FailingFunctionLogGroup
+      Code:
+        ZipFile: |
+          import logging
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          # Stands in for the user table. Record u-1002 was written without an email.
+          USERS = {
+              "u-1001": {"email": "Ana.Silva@Example.com ", "purchase_count": 3},
+              "u-1002": {"email": None, "purchase_count": 12},
+          }
+
+
+          def calculate_tier(purchase_count):
+              if (purchase_count or 0) >= 10:
+                  return "gold"
+              return "standard"
+
+
+          def lambda_handler(event, context):
+              user_id = (event or {}).get("user_id", "u-1002")
+              logger.info("registering user_id=%s", user_id)
+              user_data = USERS.get(user_id, {})
+              email = user_data["email"].lower().strip()  # no null check
+              tier = calculate_tier(user_data.get("purchase_count"))
+              logger.info("registered user_id=%s tier=%s", user_id, tier)
+              return {"statusCode": 200, "email": email, "tier": tier}
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: swarm
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+
+Outputs:
+  WorkshopLab:
+    Description: Stack that serves Lab 4 (Swarm)
+    Value: !Ref AWS::StackName
+    Export:
+      Name: multi-agent-workshop:swarm:stack
+  ProvisionedBy:
+    Description: Who deployed this stack (notebook or workshop-studio)
+    Value: !Ref ProvisionedBy
+    Export:
+      Name: multi-agent-workshop:swarm:provisioned-by
+  MemoryId:
+    Description: AgentCore Memory ID for create_event and retrieve_memories
+    Value: !GetAtt IncidentMemory.MemoryId
+  MemoryArn:
+    Description: AgentCore Memory ARN, for scoping IAM policies
+    Value: !GetAtt IncidentMemory.MemoryArn
+  MemoryStrategyNamespace:
+    Description: Namespace template of the semantic strategy; replace {actorId} with the actor ID
+    Value: /incidents/{actorId}/
+  FailingFunctionName:
+    Description: Name of the Lambda function that fails on purpose
+    Value: !Ref FailingFunction
+  FailingFunctionLogGroup:
+    Description: CloudWatch Logs log group of the failing function
+    Value: !Ref FailingFunctionLogGroup

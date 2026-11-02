@@ -1,0 +1,294 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Multi-agent workshop, Agents as Tools lab. An Amazon Bedrock AgentCore Gateway exposes three
+  read-only expense tools, served by one AWS Lambda function, as MCP tools. Callers authenticate
+  with an Amazon Cognito client-credentials token. The same template is deployed either by the
+  notebook (ProvisionedBy=notebook, stack multi-agent-workshop-agents-as-tools) or by Workshop
+  Studio (ProvisionedBy=workshop-studio). The notebook finds the stack through the export
+  multi-agent-workshop:agents-as-tools:stack and deletes it only when it deployed it.
+
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
+
+Parameters:
+  ProvisionedBy:
+    Type: String
+    Description: Who deploys this stack. The notebook deletes only stacks it deployed.
+    AllowedValues:
+      - notebook
+      - workshop-studio
+    Default: notebook
+
+Resources:
+  # Inbound auth: a Cognito user pool that issues machine-to-machine access tokens.
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolTags:
+        multi-agent-workshop:lab: agents-as-tools
+        multi-agent-workshop:provisioned-by: !Ref ProvisionedBy
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref UserPool
+      # Domain prefixes are unique per Region across all accounts, so add the account ID and
+      # Region. Prefixes allow lowercase letters, digits, and hyphens (at most 63 characters) and
+      # must not contain "aws", "amazon", or "cognito". One stack per lab per account and Region.
+      Domain: !Sub 'maw-tools-${AWS::AccountId}-${AWS::Region}'
+
+  ResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Properties:
+      UserPoolId: !Ref UserPool
+      Identifier: expense-tools
+      Name: Expense tools
+      Scopes:
+        - ScopeName: invoke
+          ScopeDescription: Call the expense tools through the gateway
+
+  AgentClient:
+    Type: AWS::Cognito::UserPoolClient
+    DependsOn: ResourceServer
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: expense-agents
+      GenerateSecret: true
+      AllowedOAuthFlows:
+        - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - expense-tools/invoke
+      SupportedIdentityProviders:
+        - COGNITO
+
+  # The tools: one Lambda function that answers all three tools from fixed workshop data.
+  ToolsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: agents-as-tools
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+
+  ToolsFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: agents-as-tools
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+      Policies:
+        - PolicyName: write-logs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:${ToolsLogGroup}:log-stream:*'
+
+  ToolsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Multi-agent workshop expense tools behind the AgentCore Gateway
+      Runtime: python3.13
+      Handler: index.handler
+      Role: !GetAtt ToolsFunctionRole.Arn
+      Timeout: 10
+      MemorySize: 128
+      LoggingConfig:
+        LogGroup: !Ref ToolsLogGroup
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: agents-as-tools
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+      Code:
+        ZipFile: |
+          RECEIPTS = {
+              "expense-1042": {
+                  "expense_id": "expense-1042",
+                  "employee_id": "emp-4412",
+                  "merchant": "Cedar Cafe",
+                  "date": "2026-09-10",
+                  "total": "92.00",
+                  "currency": "USD",
+                  "purpose": "Team dinner after a customer workshop",
+              },
+          }
+
+          POLICIES = {
+              "meals": (
+                  "Meals up to and including USD 75 can be submitted without an exception. "
+                  "Meals above USD 75 require an exception approved by a Finance Director "
+                  "before the expense date."
+              ),
+          }
+
+          PRIOR_CLAIMS = {
+              "emp-4412": [
+                  {
+                      "expense_id": "expense-0998",
+                      "merchant": "Cedar Cafe",
+                      "date": "2026-09-10",
+                      "total": "92.00",
+                      "currency": "USD",
+                      "purpose": "Team dinner after a customer workshop",
+                      "status": "paid",
+                  },
+              ],
+          }
+
+
+          def handler(event, context):
+              # The gateway names the tool as "<target>___<tool>" in the client context.
+              tool = context.client_context.custom["bedrockAgentCoreToolName"].split("___")[-1]
+              if tool == "get_receipt":
+                  key = event.get("expense_id", "")
+                  return RECEIPTS.get(key, {"error": f"no receipt for expense ID {key!r}"})
+              if tool == "get_expense_policy":
+                  key = event.get("category", "").lower()
+                  if key not in POLICIES:
+                      return {"error": f"no policy for category {key!r}", "categories": sorted(POLICIES)}
+                  return {"category": key, "policy": POLICIES[key]}
+              if tool == "list_prior_claims":
+                  return {"claims": PRIOR_CLAIMS.get(event.get("employee_id", ""), [])}
+              return {"error": f"unknown tool {tool!r}"}
+
+  # The gateway: an MCP endpoint that accepts only tokens issued to AgentClient.
+  GatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              ArnLike:
+                aws:SourceArn: !Sub 'arn:${AWS::Partition}:bedrock-agentcore:${AWS::Region}:${AWS::AccountId}:gateway/*'
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: agents-as-tools
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+      Policies:
+        - PolicyName: invoke-expense-tools
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt ToolsFunction.Arn
+
+  Gateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Properties:
+      # The Gateway requires a name, unique in the account and Region. Add the account ID and Region
+      # rather than the stack name, which differs between the two deployment modes.
+      Name: !Sub 'maw-tools-${AWS::AccountId}-${AWS::Region}'
+      Description: Expense tools for the multi-agent workshop Agents as Tools lab
+      ProtocolType: MCP
+      RoleArn: !GetAtt GatewayRole.Arn
+      AuthorizerType: CUSTOM_JWT
+      AuthorizerConfiguration:
+        CustomJWTAuthorizer:
+          DiscoveryUrl: !Sub 'https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/openid-configuration'
+          AllowedClients:
+            - !Ref AgentClient
+      Tags:
+        multi-agent-workshop:lab: agents-as-tools
+        multi-agent-workshop:provisioned-by: !Ref ProvisionedBy
+
+  ToolsTarget:
+    Type: AWS::BedrockAgentCore::GatewayTarget
+    Properties:
+      GatewayIdentifier: !GetAtt Gateway.GatewayIdentifier
+      Name: expenses
+      Description: Receipts, expense policies, and prior claims
+      CredentialProviderConfigurations:
+        - CredentialProviderType: GATEWAY_IAM_ROLE
+      TargetConfiguration:
+        Mcp:
+          Lambda:
+            LambdaArn: !GetAtt ToolsFunction.Arn
+            ToolSchema:
+              InlinePayload:
+                - Name: get_receipt
+                  Description: >-
+                    Return the receipt for one expense: employee ID, merchant, date, total,
+                    currency, and business purpose.
+                  InputSchema:
+                    Type: object
+                    Properties:
+                      expense_id:
+                        Type: string
+                        Description: Expense ID, for example expense-1042
+                    Required:
+                      - expense_id
+                - Name: get_expense_policy
+                  Description: Return the company expense policy for one expense category.
+                  InputSchema:
+                    Type: object
+                    Properties:
+                      category:
+                        Type: string
+                        Description: Expense category, for example meals
+                    Required:
+                      - category
+                - Name: list_prior_claims
+                  Description: Return an employee's prior expense claims.
+                  InputSchema:
+                    Type: object
+                    Properties:
+                      employee_id:
+                        Type: string
+                        Description: Employee ID, for example emp-4412
+                    Required:
+                      - employee_id
+
+Outputs:
+  # Discovery: Workshop Studio cannot tag stacks, so the notebook finds this stack by export name.
+  WorkshopLab:
+    Description: Name of the stack that serves the agents-as-tools lab
+    Value: !Ref AWS::StackName
+    Export:
+      Name: multi-agent-workshop:agents-as-tools:stack
+  ProvisionedBy:
+    Description: notebook or workshop-studio; the notebook deletes only stacks it deployed
+    Value: !Ref ProvisionedBy
+    Export:
+      Name: multi-agent-workshop:agents-as-tools:provisioned-by
+  GatewayUrl:
+    Value: !GetAtt Gateway.GatewayUrl
+  GatewayId:
+    Value: !GetAtt Gateway.GatewayIdentifier
+  GatewayArn:
+    Value: !GetAtt Gateway.GatewayArn
+  TargetName:
+    Value: expenses
+  UserPoolId:
+    Value: !Ref UserPool
+  ClientId:
+    Value: !Ref AgentClient
+  TokenUrl:
+    Value: !Sub 'https://${UserPoolDomain}.auth.${AWS::Region}.amazoncognito.com/oauth2/token'
+  Scope:
+    Value: expense-tools/invoke

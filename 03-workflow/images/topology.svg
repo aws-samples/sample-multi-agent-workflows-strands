@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1257 402" width="1257" height="402" style="--bg:#FFFFFF;--fg:#16191F;--line:#6C7781;--accent:#5A6570;--muted:#5A6570;--surface:#FFFFFF;--border:#C6CDD5;background:#FFFFFF">
+<style>
+  text { font-family: Helvetica; }
+</style>
+<rect width="1257" height="402" fill="#FFFFFF"/>
+<text x="30" y="34" font-size="19" font-weight="700" fill="#16191F">Lab 3  ·  Workflow  ·  your code owns the route, as plain Python</text>
+<text x="30" y="58" font-size="14" font-weight="400" fill="#5A6570">Every claim takes the same stages, and typed results cross each boundary.</text>
+<g transform="translate(30, 96)">
+<style>
+  text { font-family: 'Helvetica', system-ui, sans-serif; }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="#5A6570" stroke="#5A6570" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="#5A6570" stroke="#5A6570" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="stages" data-label="same stages for every claim, run concurrently">
+  <rect x="506.28200000000004" y="8" width="156.20099999999996" height="213.60000000000002" rx="12" ry="12" fill="none" stroke="#146EB4" stroke-width="1.4" stroke-dasharray="6 6" opacity="0.8" />
+  <text x="584.3825" y="-1" text-anchor="middle" font-size="13" font-weight="700" fill="#146EB4">same stages for every claim, run concurrently</text>
+</g>
+<polyline class="edge" data-from="receipt_image" data-to="extractor" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="130.719,128.8 194.719,128.8" fill="none" stroke="#6C7781" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="decide" data-to="record" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="986.937,128.8 1050.937,128.8" fill="none" stroke="#6C7781" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="extractor" data-to="policy" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="ReceiptFacts" points="339.668,119.83333333333334 351.668,119.83333333333334 351.668,78.9 524.1345000000001,78.9" fill="none" stroke="#6C7781" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="extractor" data-to="audit" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="ReceiptFacts" points="339.668,137.76666666666668 351.668,137.76666666666668 351.668,178.70000000000002 524.1345000000001,178.70000000000002" fill="none" stroke="#6C7781" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="policy" data-to="decide" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="StageReview" points="648.3355000000001,78.9 815.9089999999999,78.9 815.9089999999999,119.83333333333334 827.9089999999999,119.83333333333334" fill="none" stroke="#6C7781" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="audit" data-to="decide" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="StageReview" points="640.9255,178.70000000000002 815.9089999999999,178.70000000000002 815.9089999999999,137.76666666666668 827.9089999999999,137.76666666666668" fill="none" stroke="#6C7781" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="extractor" data-to="policy" data-label="ReceiptFacts">
+  <rect x="359.668" y="62.90000000000001" width="80.61400000000002" height="30.3" rx="2" ry="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1" />
+  <text x="399.975" y="78.05000000000001" text-anchor="middle" font-size="11" font-weight="400" fill="#5A6570" dy="3.8499999999999996">ReceiptFacts</text>
+</g>
+<g class="edge-label" data-from="extractor" data-to="audit" data-label="ReceiptFacts">
+  <rect x="359.668" y="162.70000000000002" width="80.61400000000002" height="30.3" rx="2" ry="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1" />
+  <text x="399.975" y="177.85000000000002" text-anchor="middle" font-size="11" font-weight="400" fill="#5A6570" dy="3.8499999999999996">ReceiptFacts</text>
+</g>
+<g class="edge-label" data-from="policy" data-to="decide" data-label="StageReview">
+  <rect x="728.4830000000001" y="62.90000000000001" width="79.42599999999999" height="30.3" rx="2" ry="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1" />
+  <text x="768.196" y="78.05000000000001" text-anchor="middle" font-size="11" font-weight="400" fill="#5A6570" dy="3.8499999999999996">StageReview</text>
+</g>
+<g class="edge-label" data-from="audit" data-to="decide" data-label="StageReview">
+  <rect x="728.4830000000001" y="162.70000000000002" width="79.42599999999999" height="30.3" rx="2" ry="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1" />
+  <text x="768.196" y="177.85000000000002" text-anchor="middle" font-size="11" font-weight="400" fill="#5A6570" dy="3.8499999999999996">StageReview</text>
+</g>
+<g class="node" data-id="receipt_image" data-label="Receipt image
+S3 bucket" data-shape="rectangle">
+  <rect x="8" y="101.9" width="122.71900000000001" height="53.800000000000004" rx="0" ry="0" fill="#FFFFFF" stroke="#8D99A6" stroke-width="1.4"  stroke-dasharray="7 5" />
+  <text x="69.3595" y="128.8" text-anchor="middle" font-size="13" font-weight="500" fill="#5A6570"><tspan x="69.3595" dy="-3.9000000000000012">Receipt image</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="69.3595" dy="16.900000000000002">S3 bucket</tspan></text>
+</g>
+<g class="node" data-id="extractor" data-label="Receipt Extractor
+extractor" data-shape="rectangle">
+  <rect x="194.719" y="101.9" width="144.949" height="53.800000000000004" rx="0" ry="0" fill="#FFFFFF" stroke="#232F3E" stroke-width="2.2" />
+  <text x="267.1935" y="128.8" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="267.1935" dy="-3.9000000000000012">Receipt Extractor</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="267.1935" dy="16.900000000000002">extractor</tspan></text>
+</g>
+<g class="node" data-id="decide" data-label="Decision
+decide, plain Python" data-shape="rectangle">
+  <rect x="827.909" y="101.9" width="159.028" height="53.800000000000004" rx="0" ry="0" fill="#FFFFFF" stroke="#067D62" stroke-width="2.2" />
+  <text x="907.423" y="128.8" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="907.423" dy="-3.9000000000000012">Decision</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="907.423" dy="16.900000000000002">decide, plain Python</tspan></text>
+</g>
+<g class="node" data-id="record" data-label="Decision record
+S3 bucket" data-shape="rectangle">
+  <rect x="1050.937" y="101.9" width="137.539" height="53.800000000000004" rx="0" ry="0" fill="#FFFFFF" stroke="#8D99A6" stroke-width="1.4"  stroke-dasharray="7 5" />
+  <text x="1119.7064999999998" y="128.8" text-anchor="middle" font-size="13" font-weight="500" fill="#5A6570"><tspan x="1119.7064999999998" dy="-3.9000000000000012">Decision record</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="1119.7064999999998" dy="16.900000000000002">S3 bucket</tspan></text>
+</g>
+<g class="node" data-id="policy" data-label="Policy Review
+review, policy" data-shape="rectangle">
+  <rect x="524.1345000000001" y="52" width="124.20099999999998" height="53.800000000000004" rx="0" ry="0" fill="#FFFFFF" stroke="#146EB4" stroke-width="1.8" />
+  <text x="586.2350000000001" y="78.9" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="586.2350000000001" dy="-3.9000000000000012">Policy Review</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="586.2350000000001" dy="16.900000000000002">review, policy</tspan></text>
+</g>
+<g class="node" data-id="audit" data-label="Audit Review
+review, audit" data-shape="rectangle">
+  <rect x="524.1345000000001" y="151.8" width="116.79099999999998" height="53.800000000000004" rx="0" ry="0" fill="#FFFFFF" stroke="#146EB4" stroke-width="1.8" />
+  <text x="582.5300000000001" y="178.70000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="582.5300000000001" dy="-3.9000000000000012">Audit Review</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="582.5300000000001" dy="16.900000000000002">review, audit</tspan></text>
+</g>
+
+</g>
+<text x="30" y="353.85" font-size="13.5" font-weight="400" fill="#5A6570">The join is asyncio.gather, so decide waits for both reviews.</text>
+<text x="30" y="374.85" font-size="13.5" font-weight="400" fill="#5A6570">decide is a Python function: when a fact is missing, the outcome is INSUFFICIENT_EVIDENCE.</text>
+</svg>

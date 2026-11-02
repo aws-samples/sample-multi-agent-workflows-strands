@@ -1,0 +1,37 @@
+{
+  "_note": "Synthetic past incidents for the workshop. Services, IDs, and dates are invented.",
+  "incidents": [
+    {
+      "id": "INC-0412",
+      "date": "2026-08-18",
+      "service": "user-registration-service",
+      "symptom": "AttributeError: 'NoneType' object has no attribute 'lower' at email = user_data['email'].lower().strip()",
+      "root_cause": "A user record was written without an email attribute, so user_data['email'] was None when the handler normalized it.",
+      "fix": "Validate required fields before string operations and reject the record with a clear error; backfill the missing email attribute."
+    },
+    {
+      "id": "INC-0397",
+      "date": "2026-08-05",
+      "service": "user-registration-service",
+      "symptom": "KeyError: 'email' in lambda_handler after a mobile client release",
+      "root_cause": "The new mobile client sent the address under 'email_address' instead of 'email', so the key was absent from the request payload.",
+      "fix": "Rolled back the client field rename and added request schema validation at the API layer."
+    },
+    {
+      "id": "INC-0385",
+      "date": "2026-07-30",
+      "service": "payment-worker",
+      "symptom": "Task timed out after 15.00 seconds, clustering roughly every 15 minutes",
+      "root_cause": "A database connection pool shared with a scheduled batch job was exhausted while the job held every connection open.",
+      "fix": "Moved to a connection proxy, capped the batch job's pool usage, and added a connection-acquire timeout shorter than the function timeout."
+    },
+    {
+      "id": "INC-0351",
+      "date": "2026-07-12",
+      "service": "invoice-renderer",
+      "symptom": "Runtime.OutOfMemory on large invoices",
+      "root_cause": "The renderer loaded every line item image into memory before writing the PDF.",
+      "fix": "Streamed images one at a time and raised the function memory from 256 MB to 512 MB."
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Multi-agent workshop, Graph lab. One Amazon S3 bucket where the Strands S3SessionManager
+  persists the graph's session, so an interrupted graph can resume. The same template is deployed
+  either by the notebook (ProvisionedBy=notebook, stack multi-agent-workshop-graph) or by Workshop
+  Studio (ProvisionedBy=workshop-studio). The notebook finds the stack through the export
+  multi-agent-workshop:graph:stack. Before deleting a notebook stack, the notebook cleanup empties
+  the bucket; Workshop Studio accounts are removed with their contents.
+
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
+
+Parameters:
+  ProvisionedBy:
+    Type: String
+    Description: Who deploys this stack. The notebook deletes only stacks it deployed.
+    AllowedValues:
+      - notebook
+      - workshop-studio
+    Default: notebook
+
+Resources:
+  # Session store. No versioning: sessions are disposable, and an unversioned bucket is emptied
+  # with one delete pass before the stack is deleted.
+  SessionBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      # A fixed name with the account ID and Region, so the SageMaker execution role can grant
+      # access to this exact bucket without knowing the stack name. One stack per account and Region.
+      BucketName: !Sub 'maw-graph-sessions-${AWS::AccountId}-${AWS::Region}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+            BucketKeyEnabled: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: graph
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+
+  SessionBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SessionBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt SessionBucket.Arn
+              - !Sub '${SessionBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+
+Outputs:
+  # Discovery: Workshop Studio cannot tag stacks, so the notebook finds this stack by export name.
+  WorkshopLab:
+    Description: Name of the stack that serves the graph lab
+    Value: !Ref AWS::StackName
+    Export:
+      Name: multi-agent-workshop:graph:stack
+  ProvisionedBy:
+    Description: notebook or workshop-studio; the notebook deletes only stacks it deployed
+    Value: !Ref ProvisionedBy
+    Export:
+      Name: multi-agent-workshop:graph:provisioned-by
+  SessionBucketName:
+    Description: Bucket for the Strands S3SessionManager
+    Value: !Ref SessionBucket

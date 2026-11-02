@@ -1,0 +1,30 @@
+{
+  "_fixture": "FIXTURE, not real AgentCore Memory output. Used only when semantic extraction of the seeded incidents does not finish within the setup time budget. Shaped like memoryRecordSummaries from retrieve_memory_records.",
+  "namespace": "/incidents/{actorId}/",
+  "memoryRecordSummaries": [
+    {
+      "memoryRecordId": "fixture-INC-0412",
+      "content": {"text": "Resolved incident INC-0412. On 2026-08-18 user-registration-service raised AttributeError: 'NoneType' object has no attribute 'lower' at email = user_data['email'].lower().strip(). Root cause: a user record was written without an email attribute, so the email value was None. Fix: validate required fields before string operations and backfill the missing email."},
+      "namespaces": ["/incidents/{actorId}/"],
+      "score": 0.0
+    },
+    {
+      "memoryRecordId": "fixture-INC-0397",
+      "content": {"text": "Resolved incident INC-0397. On 2026-08-05 user-registration-service raised KeyError: 'email' after a mobile client release. Root cause: the client sent 'email_address' instead of 'email'. Fix: rolled back the field rename and added request schema validation."},
+      "namespaces": ["/incidents/{actorId}/"],
+      "score": 0.0
+    },
+    {
+      "memoryRecordId": "fixture-INC-0385",
+      "content": {"text": "Resolved incident INC-0385. On 2026-07-30 payment-worker timed out after 15 seconds roughly every 15 minutes. Root cause: a database connection pool shared with a scheduled batch job was exhausted. Fix: connection proxy, capped batch pool usage, and a connection-acquire timeout shorter than the function timeout."},
+      "namespaces": ["/incidents/{actorId}/"],
+      "score": 0.0
+    },
+    {
+      "memoryRecordId": "fixture-INC-0351",
+      "content": {"text": "Resolved incident INC-0351. On 2026-07-12 invoice-renderer failed with Runtime.OutOfMemory on large invoices. Root cause: all line item images were loaded into memory at once. Fix: stream images one at a time and raise memory to 512 MB."},
+      "namespaces": ["/incidents/{actorId}/"],
+      "score": 0.0
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Multi-agent workshop, Workflow lab. One Amazon S3 bucket for receipt images, which the notebook
+  uploads under receipts/, and for the decision records the workflow writes under decisions/. The
+  same template is deployed either by the notebook (ProvisionedBy=notebook, stack
+  multi-agent-workshop-workflow) or by Workshop Studio (ProvisionedBy=workshop-studio). The
+  notebook finds the stack through the export multi-agent-workshop:workflow:stack. Before
+  deleting a notebook stack, the notebook cleanup empties the bucket; Workshop Studio accounts
+  are removed with their contents.
+
+Metadata:
+  AWSToolsMetrics:
+    AWSAgentToolkit: aws-cloudformation@3
+
+Parameters:
+  ProvisionedBy:
+    Type: String
+    Description: Who deploys this stack. The notebook deletes only stacks it deployed.
+    AllowedValues:
+      - notebook
+      - workshop-studio
+    Default: notebook
+
+Resources:
+  # Receipts in, decisions out. No versioning: the data is synthetic and re-uploadable, and an
+  # unversioned bucket is emptied with one delete pass before the stack is deleted.
+  ReceiptBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      # A fixed name with the account ID and Region, so the SageMaker execution role can grant
+      # access to this exact bucket without knowing the stack name. One stack per account and Region.
+      BucketName: !Sub 'maw-workflow-receipts-${AWS::AccountId}-${AWS::Region}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+            BucketKeyEnabled: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      Tags:
+        - Key: multi-agent-workshop:lab
+          Value: workflow
+        - Key: multi-agent-workshop:provisioned-by
+          Value: !Ref ProvisionedBy
+
+  ReceiptBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ReceiptBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt ReceiptBucket.Arn
+              - !Sub '${ReceiptBucket.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+
+Outputs:
+  # Discovery: Workshop Studio cannot tag stacks, so the notebook finds this stack by export name.
+  WorkshopLab:
+    Description: Name of the stack that serves the workflow lab
+    Value: !Ref AWS::StackName
+    Export:
+      Name: multi-agent-workshop:workflow:stack
+  ProvisionedBy:
+    Description: notebook or workshop-studio; the notebook deletes only stacks it deployed
+    Value: !Ref ProvisionedBy
+    Export:
+      Name: multi-agent-workshop:workflow:provisioned-by
+  ReceiptBucketName:
+    Description: Bucket for receipts/ (uploaded by the notebook) and decisions/ (written by the workflow)
+    Value: !Ref ReceiptBucket

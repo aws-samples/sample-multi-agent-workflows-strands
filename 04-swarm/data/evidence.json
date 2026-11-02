@@ -1,0 +1,14 @@
+{
+  "_note": "Evidence for the investigator tools. user-registration-service is the Lambda function the lab stack deploys, so its logs come from CloudWatch Logs. Services, IDs, and runbooks are invented.",
+  "services": {
+    "user-registration-service": {
+      "source": "import logging\n\nlogger = logging.getLogger()\nlogger.setLevel(logging.INFO)\n\n# Stands in for the user table. Record u-1002 was written without an email.\nUSERS = {\n    \"u-1001\": {\"email\": \"Ana.Silva@Example.com \", \"purchase_count\": 3},\n    \"u-1002\": {\"email\": None, \"purchase_count\": 12},\n}\n\n\ndef calculate_tier(purchase_count):\n    if (purchase_count or 0) >= 10:\n        return \"gold\"\n    return \"standard\"\n\n\ndef lambda_handler(event, context):\n    user_id = (event or {}).get(\"user_id\", \"u-1002\")\n    logger.info(\"registering user_id=%s\", user_id)\n    user_data = USERS.get(user_id, {})\n    email = user_data[\"email\"].lower().strip()  # no null check\n    tier = calculate_tier(user_data.get(\"purchase_count\"))\n    logger.info(\"registered user_id=%s tier=%s\", user_id, tier)\n    return {\"statusCode\": 200, \"email\": email, \"tier\": tier}\n"
+    }
+  },
+  "docs": [
+    "Runbook: Null field handling. An AttributeError such as 'NoneType' object has no attribute 'lower' on a string method usually means an optional field such as email was missing or None. Validate required fields before string operations, return a clear 400 error, and backfill the bad record.",
+    "Runbook: Connection pool exhaustion. Intermittent Lambda timeouts at a fixed interval, with no code change, usually mean a shared database connection pool is drained by a scheduled job. Use a connection proxy, cap the job's pool usage, and set a connection-acquire timeout shorter than the function timeout.",
+    "Runbook: Lambda timeouts. A timeout means the handler did not return within the configured limit. Check downstream calls, waits on locks or connections, and cold starts before raising the timeout.",
+    "Runbook: Out of memory. Runtime.OutOfMemory means the function exceeded its memory setting. Stream large payloads instead of loading them at once, then size memory from the max memory used in the REPORT line."
+  ]
+}

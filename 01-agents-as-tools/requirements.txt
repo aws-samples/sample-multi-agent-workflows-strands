@@ -1,0 +1,4 @@
+strands-agents==1.56.0
+mcp==1.30.0
+httpx==0.28.1
+markdown-it-py==4.2.0

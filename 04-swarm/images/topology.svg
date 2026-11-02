@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1350 620" width="1350" height="620">
+<style>
+  text { font-family: Helvetica; }
+</style>
+<rect width="1350" height="620" fill="#FFFFFF"/>
+<text x="30" y="34" font-size="19" font-weight="700" fill="#16191F">Lab 4  ·  Swarm evidence gathering  ·  deterministic final analysis</text>
+<text x="30" y="58" font-size="14" fill="#5A6570">Investigators choose the evidence path. Validated tool outputs then cross a fixed boundary to one final analyzer.</text>
+<rect x="300" y="112" width="580" height="302" rx="12" fill="none" stroke="#146EB4" stroke-width="1.4" stroke-dasharray="6 6" opacity="0.8"/>
+<text x="590" y="102" text-anchor="middle" font-size="13" font-weight="700" fill="#146EB4">evidence Swarm: any investigator can hand off to either teammate</text>
+<polyline points="536.0,177.0 644.0,177.0" fill="none" stroke="#6C7781" stroke-width="1.2"/>
+<polygon points="644.0,177.0 635.0,180.2 635.0,173.8" fill="#5A6570"/>
+<polygon points="536.0,177.0 545.0,173.8 545.0,180.2" fill="#5A6570"/>
+<polyline points="459.3333333333333,210.0 560.6666666666666,324.0" fill="none" stroke="#6C7781" stroke-width="1.2"/>
+<polygon points="560.6666666666666,324.0 552.2956822974096,319.39928041610284 557.079101936985,315.1473518475913" fill="#5A6570"/>
+<polygon points="459.3333333333333,210.0 467.7043177025903,214.60071958389722 462.9208980630149,218.85264815240868" fill="#5A6570"/>
+<polyline points="720.6666666666666,210.0 619.3333333333334,324.0" fill="none" stroke="#6C7781" stroke-width="1.2"/>
+<polygon points="619.3333333333334,324.0 622.920898063015,315.1473518475913 627.7043177025904,319.39928041610284" fill="#5A6570"/>
+<polygon points="720.6666666666666,210.0 717.079101936985,218.85264815240868 712.2956822974096,214.60071958389722" fill="#5A6570"/>
+<rect x="532.4" y="231" width="115.2" height="30" rx="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1"/>
+<text x="590" y="250" text-anchor="middle" font-size="11" fill="#5A6570">handoff_to_agent</text>
+<rect x="330" y="150" width="200" height="54" fill="#FFFFFF" stroke="#232F3E" stroke-width="2.2"/>
+<text x="430.0" y="177.0" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="430.0" dy="-3.9">Logs Investigator</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="430.0" dy="16.9">logs_investigator</tspan></text>
+<rect x="650" y="150" width="200" height="54" fill="#FFFFFF" stroke="#146EB4" stroke-width="1.8"/>
+<text x="750.0" y="177.0" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="750.0" dy="-3.9">Code Investigator</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="750.0" dy="16.9">code_investigator</tspan></text>
+<rect x="490" y="330" width="200" height="54" fill="#FFFFFF" stroke="#146EB4" stroke-width="1.8"/>
+<text x="590.0" y="357.0" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="590.0" dy="-3.9">Docs Investigator</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="590.0" dy="16.9">docs_investigator</tspan></text>
+<rect x="40" y="150" width="150" height="54" fill="#FFFFFF" stroke="#8D99A6" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="115.0" y="177.0" text-anchor="middle" font-size="13" font-weight="500" fill="#5A6570"><tspan x="115.0" dy="-3.9">Incident</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="115.0" dy="16.9">task</tspan></text>
+<polyline points="190,177 324,177" fill="none" stroke="#6C7781" stroke-width="1.2"/>
+<polygon points="324,177 315.0,180.2 315.0,173.8" fill="#5A6570"/>
+<rect x="214.9" y="162" width="84.2" height="30" rx="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1"/>
+<text x="257" y="181" text-anchor="middle" font-size="11" fill="#5A6570">entry_point</text>
+<rect x="920" y="220" width="200" height="54" fill="#FFFFFF" stroke="#067D62" stroke-width="2.2"/>
+<text x="1020.0" y="247.0" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="1020.0" dy="-3.9">Validate evidence</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="1020.0" dy="16.9">deterministic Python</tspan></text>
+<polyline points="690,357 800,357 800,247 914,247" fill="none" stroke="#6C7781" stroke-width="1.2"/>
+<polygon points="914,247 905.0,250.2 905.0,243.8" fill="#5A6570"/>
+<rect x="748.6" y="287" width="102.8" height="30" rx="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1"/>
+<text x="800" y="306" text-anchor="middle" font-size="11" fill="#5A6570">required tools</text>
+<rect x="920" y="330" width="200" height="54" fill="#FFFFFF" stroke="#067D62" stroke-width="2.2"/>
+<text x="1020.0" y="357.0" text-anchor="middle" font-size="13" font-weight="500" fill="#16191F"><tspan x="1020.0" dy="-3.9">Final Analyzer</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="1020.0" dy="16.9">analyzer</tspan></text>
+<polyline points="1020,274 1020,324" fill="none" stroke="#6C7781" stroke-width="1.2"/>
+<polygon points="1020,324 1016.8,315.0 1023.2,315.0" fill="#5A6570"/>
+<rect x="1029.4" y="287" width="115.2" height="30" rx="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1"/>
+<text x="1087" y="306" text-anchor="middle" font-size="11" fill="#5A6570">run exactly once</text>
+<rect x="1130" y="330" width="200" height="54" fill="#FFFFFF" stroke="#8D99A6" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="1230.0" y="357.0" text-anchor="middle" font-size="13" font-weight="500" fill="#5A6570"><tspan x="1230.0" dy="-3.9">Root cause and fix</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="1230.0" dy="16.9">result</tspan></text>
+<polyline points="1120,357 1124,357" fill="none" stroke="#6C7781" stroke-width="1.2"/>
+<polygon points="1124,357 1115.0,360.2 1115.0,353.8" fill="#5A6570"/>
+<rect x="1130" y="443" width="200" height="54" fill="#FFFFFF" stroke="#8D99A6" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="1230.0" y="470.0" text-anchor="middle" font-size="13" font-weight="500" fill="#5A6570"><tspan x="1230.0" dy="-3.9">Past incidents</tspan><tspan font-family="Menlo, Consolas, monospace" font-size="11.5" fill="#5A6570" x="1230.0" dy="16.9">AgentCore Memory</tspan></text>
+<polyline points="1020,390 1020,470 1124,470" fill="none" stroke="#6C7781" stroke-width="1.2" stroke-dasharray="4 4"/>
+<polygon points="1124,470 1115.0,473.2 1115.0,466.8" fill="#5A6570"/>
+<rect x="917.9" y="455" width="84.2" height="30" rx="2" fill="#FFFFFF" stroke="#e3e3e4" stroke-width="1"/>
+<text x="960" y="474" text-anchor="middle" font-size="11" fill="#5A6570">recall tool</text>
+<text x="30" y="548" font-size="13.5" fill="#5A6570">Each two-way arrow is a handoff_to_agent call. A run uses only some of them; node_history shows which.</text>
+<text x="30" y="569" font-size="13.5" fill="#5A6570">Strands completes a Swarm when the active investigator does not hand off, so tool-call validation—not status alone—closes evidence gathering.</text>
+<text x="30" y="590" font-size="13.5" fill="#5A6570">The analyzer is outside the Swarm: it receives the validated evidence, recalls memory, answers once, and is never a handoff target.</text>
+</svg>
