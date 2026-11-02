@@ -13,7 +13,7 @@ from a new session. There is no agent code to edit.
 ## Running it
 
 Open `swarm.ipynb` in a fresh kernel. Run the `%pip` setup cell by itself first. If it installs or upgrades
-anything, restart the kernel, then run through the lab-resource cell. If you plan to complete Lab 6, run
+anything, restart the kernel, then run through the lab-resource cell. If you plan to try Lab 6, run
 **Optional: Enable observability** before Memory data preparation; otherwise skip it. The optional cell enables
 Memory application logs and managed traces. Select **Prepare the lab
 data** and choose **Run > Run All Below**.

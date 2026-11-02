@@ -51,7 +51,7 @@ All labs use **Amazon Bedrock** for model inference (all models are pre-approved
 
 | Item | Category | Rationale |
 |------|----------|-----------|
-| S3 buckets use SSE-KMS with the AWS-managed `aws/s3` key | By design | S3 buckets use SSE-KMS with the AWS-managed `aws/s3` key; use a customer-managed key for production — see Production Hardening Recommendations |
+| S3 buckets use SSE-KMS with the AWS-managed `aws/s3` key | By design | The workshop buckets hold only synthetic data and are disposable, so they use SSE-KMS with the AWS managed `aws/s3` key: objects are encrypted at rest with no key to create, manage, or schedule for deletion. For production, use a customer managed key so you control its key policy, rotation, and lifecycle — see Production Hardening Recommendations |
 | Lambda CloudWatch log groups not KMS-encrypted | Security Debt | 7-day retention, synthetic/workshop data only; acceptable for educational content |
 | S3 access logging not configured | Non-blocking | Disposable workshop buckets; access audit trails not needed for synthetic data |
 | S3 versioning not enabled | By design | Session and receipt data is synthetic and re-uploadable; unversioned buckets empty cleanly |

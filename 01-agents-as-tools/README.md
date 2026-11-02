@@ -12,7 +12,7 @@ as structured output.
 ## Running it
 
 Open `agents_as_tools.ipynb` in a fresh kernel. Run the `%pip` setup cell by itself first. If it installs or
-upgrades anything, restart the kernel, then run through the lab-resource cell. If you plan to complete Lab 6,
+upgrades anything, restart the kernel, then run through the lab-resource cell. If you plan to try Lab 6,
 run **Optional: Enable observability** before the first Gateway call; otherwise skip it. Select **List the
 Gateway tools** and choose **Run > Run All Below**. There is no agent code to change.
 
