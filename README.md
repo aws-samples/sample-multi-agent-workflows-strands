@@ -20,7 +20,7 @@ activity when you plan to try Lab 6.
 
 - **A US AWS Region.** The labs use `us.amazon.nova-pro-v1:0`, a US cross-Region inference profile, so run the
   notebooks in a US Region.
-- **Python 3.11 or later.**
+- **Python 3.12 or later.**
 - **Amazon Bedrock model access** for Amazon Nova Pro, Anthropic Claude Sonnet 5, and Anthropic Claude Haiku 4.5.
 - **IAM permissions** to deploy and delete the Labs 1-4 CloudFormation stacks and the resources they create.
 
