@@ -116,7 +116,9 @@ class LivePanes:
         """Redraw on every state change, and at most every REFRESH_SECONDS while text streams in."""
         if self.panes and (force or time.monotonic() >= self.next_render):
             grid = "".join(pane.html() for pane in self.panes.values())
-            page = HTML(f'<div class="live-panes" id="{self.id}" style="{GRID_STYLE}">{grid}</div>')
+            page = HTML(
+                f'<div class="live-panes mathjax_ignore" id="{self.id}" style="{GRID_STYLE}">{grid}</div>'
+            )
             # display_id=True returns a handle; update() then replaces that one output in place.
             if self.handle is None:
                 self.handle = display(page, display_id=True)
@@ -221,4 +223,9 @@ def show_conversations(agents):
                     pane.write(f"`[result: {result.get('status', 'success')}]` {text}\n\n")
         pane.stop("Completed")
         panes.append(pane.html())
-    display(HTML(f'<div class="agent-conversations" style="{GRID_STYLE}">{"".join(panes)}</div>'))
+    display(
+        HTML(
+            f'<div class="agent-conversations mathjax_ignore" style="{GRID_STYLE}">'
+            f'{"".join(panes)}</div>'
+        )
+    )
